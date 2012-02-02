@@ -3,11 +3,15 @@ Created on Apr 18, 2011
 
 @author: mike-bowles
 '''
+import os
 from mrjob.job import MRJob
 
 from numpy import mat, zeros, shape, random, array, zeros_like
 from random import sample
 import json
+
+
+PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 class MRkMeansInit(MRJob):
     DEFAULT_PROTOCOL = 'json'
@@ -24,7 +28,7 @@ class MRkMeansInit(MRJob):
             '--k', dest='kMeans', default=2, type='int',
             help='k: number of means (cluster centroids)')
         self.add_passthrough_option(
-            '--pathName', dest='pathName', default="//home//mike-bowles//pyWorkspace//mapReducers//src//kMeans3//", type='str',
+            '--pathName', dest='pathName', default=PROJECT_ROOT, type='str',
             help='pathName: pathname where intermediateResults.txt is stored')
         
     def mapper(self, key, xjIn):
@@ -48,7 +52,7 @@ class MRkMeansInit(MRJob):
                
         centOut = json.dumps(cent2)
         #put centroids onto file to load in at next instantiation of "self"
-        fullPath = self.options.pathName + 'intermediateResults.txt'
+        fullPath = os.path.join(self.options.pathName , 'intermediateResults.txt')
         fileOut = open(fullPath,'w')
         fileOut.write(centOut)
         fileOut.close()

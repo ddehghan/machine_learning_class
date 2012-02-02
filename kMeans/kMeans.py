@@ -7,6 +7,7 @@ from mr_kMeansInitialize import MRkMeansInit
 from mr_kMeansIterate import MRkMeansIter
 import json
 from math import sqrt
+import os
 
 '''
 This is a calling program to run several mr jobs
@@ -20,6 +21,8 @@ d.  spread reducer calc over multiple reducers.
 
 '''
 
+PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+
 
 def dist(x,y):
     #euclidean distance between two lists    
@@ -32,13 +35,13 @@ def dist(x,y):
 
 def main():
     #first run the initializer to get starting centroids
-    filePath = '/home/mike-bowles/pyWorkspace/mapReducers/src/kMeans3/input.txt'
+    filePath =  os.path.join(PROJECT_ROOT, 'input.txt')
     mrJob = MRkMeansInit(args=[filePath])
     with mrJob.make_runner() as runner:
         runner.run()
     
     #pull out the centroid values to compare with values after one iteration
-    centPath = "//home//mike-bowles//pyWorkspace//mapReducers//src//kMeans3//intermediateResults.txt"
+    centPath = os.path.join(PROJECT_ROOT, 'intermediateResults.txt')
     fileIn = open(centPath)
     centroidsJson = fileIn.read()
     fileIn.close()

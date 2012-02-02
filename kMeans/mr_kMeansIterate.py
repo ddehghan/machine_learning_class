@@ -3,12 +3,15 @@ Created on Apr 18, 2011
 
 @author: mike-bowles
 '''
+import os
 from mrjob.job import MRJob
 
 from math import sqrt
 from numpy import mat, zeros, shape, random, array, zeros_like
 from random import sample
 import json
+
+PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 def dist(x,y):
     #euclidean distance between two lists    
@@ -40,7 +43,8 @@ class MRkMeansIter(MRJob):
         super(MRkMeansIter, self).__init__(*args, **kwargs)
         self.centroids = []                  #current centroid list
         self.new_centroid = []
-        fullPath = self.options.pathName + 'intermediateResults.txt'
+        fullPath = os.path.join(self.options.pathName , 'intermediateResults.txt')
+
         fileIn = open(fullPath)
         centroidsJson = fileIn.read()
         fileIn.close()
@@ -56,7 +60,7 @@ class MRkMeansIter(MRJob):
             '--k', dest='kMeans', default=2, type='int',
             help='k: number of means (cluster centroids)')
         self.add_passthrough_option(
-            '--pathName', dest='pathName', default="//home//mike-bowles//pyWorkspace//mapReducers//src//kMeans3//", type='str',
+            '--pathName', dest='pathName', default=PROJECT_ROOT, type='str',
             help='pathName: pathname where intermediateResults.txt is stored')
         
     def mapper(self, key, val):
@@ -123,7 +127,7 @@ class MRkMeansIter(MRJob):
             
         #write new centroids to file
         centOut = json.dumps(newCentroid)
-        fullPath = self.options.pathName + 'intermediateResults.txt'
+        fullPath = os.path.join(self.options.pathName , 'intermediateResults.txt')
         fileOut = open(fullPath,'w')
         fileOut.write(centOut)
         fileOut.close()
