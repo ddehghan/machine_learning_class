@@ -89,8 +89,7 @@ class MRkMeansIter(MRJob):
         self.count2[index] += 1
         temp = self.new_centroid[index]
         self.new_centroid[index] = plus(temp,x)
-#        if False: yield 1,2
-        
+
     def mapper_final(self):
         out = [self.new_centroid,self.count2]
         jOut = json.dumps(out)
@@ -131,8 +130,7 @@ class MRkMeansIter(MRJob):
         fileOut = open(fullPath,'w')
         fileOut.write(centOut)
         fileOut.close()
-        if False: yield 1,2
-        
+
     #def steps(self):
         #return ([self.mr(mapper=self.mapper,reducer=None,mapper_final=None)])
             
