@@ -3,14 +3,16 @@ Created on Mar 18, 2011
 
 @author: mike-bowles
 '''
-
+import os
 
 from numpy import random
 import json
 
-pathname="//home//mike-bowles//pyWorkspace//mapReducers//src//mr_kMeans2//"
-filename="input.txt"
-fileOut=open(pathname+filename,"w") 
+PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+
+
+filename=os.path.join(PROJECT_ROOT , 'input.txt')
+fileOut=open(filename,"w")
 #generate a 2-dim example.  5 centers picked randomly in (0,10) each with 
 #100 samples of gaussian unit variance samples
 

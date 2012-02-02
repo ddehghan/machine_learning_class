@@ -89,7 +89,7 @@ class MRkMeansIter(MRJob):
         self.count2[index] += 1
         temp = self.new_centroid[index]
         self.new_centroid[index] = plus(temp,x)
-        if False: yield 1,2
+#        if False: yield 1,2
         
     def mapper_final(self):
         out = [self.new_centroid,self.count2]
