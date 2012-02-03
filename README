@@ -1,0 +1,11 @@
+
+
+Here are my files from ML-Class. I am not taking credit for writing all these. In some cases I have made some improvements to make them run more cleanly. 
+
+David
+
+
+mrjob_setup     - My setup file for MrJob
+char_counter    - Simple script to count chars in a file
+mean_variance   _ calculate mean and variance of a list of numbers using map reduce
+kMean           - Calculate kMeans
