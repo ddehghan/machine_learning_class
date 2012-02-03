@@ -48,7 +48,7 @@ def main():
     
     delta = 10
     #Begin iteration on change in centroids
-    while delta > 0.01:
+    while delta > 0.001:
         #parse old centroid values
         oldCentroids = json.loads(centroidsJson)
         #run one iteration
@@ -67,8 +67,8 @@ def main():
         delta = 0.0
         for i in range(kMeans):
             delta += dist(newCentroids[i],oldCentroids[i])
-        
-        print delta
+
+        print "delta={0},  centers={1}" .format(delta, str(newCentroids))
 
 if __name__ == '__main__':
     main()
