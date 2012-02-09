@@ -71,7 +71,7 @@ class mrSample(MRJob):
         i = 0
         for sample_set in samples_from_mappers:
             weight = counts_from_mappers[i] * 1.0 / total_counts_from_mappers
-            number_of_needed_samples = int(weight * self.options.sample_size)
+            number_of_needed_samples = int(round(weight * self.options.sample_size))
             for j in range(number_of_needed_samples):
 
 
