@@ -8,16 +8,15 @@ import random
 from mrjob.job import MRJob
 from math import sqrt
 import json
-from mrjob.protocol import JSONValueProtocol, PickleProtocol, RawValueProtocol
+from mrjob.protocol import JSONValueProtocol, PickleProtocol, RawValueProtocol, JSONProtocol
 
 
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 
 class mrSample(MRJob):
-
     INPUT_PROTOCOL = RawValueProtocol
-    INTERNAL_PROTOCOL = RawValueProtocol
+    INTERNAL_PROTOCOL = JSONProtocol
     OUTPUT_PROTOCOL = RawValueProtocol
 
 
@@ -37,22 +36,22 @@ class mrSample(MRJob):
             help='number of samples in the output file')
 
     def mapper(self, key, line):
-#        num = json.loads(line)
-        num = line
+        sample_line = line
 
         self.count += 1
         if len(self.samples) <= self.options.sample_size:
-            self.samples.append(num)
+            self.samples.append(sample_line)
         else:
             expected_prob = (self.options.sample_size * 1.0) / self.count
             actual_prob = random.random()
             if actual_prob <= expected_prob:
                 index = random.randint(0, self.options.sample_size)
-                self.samples[index] = num
+                self.samples[index] = sample_line
 
     def mapper_final(self):
         out = [self.count, self.samples]
         jOut = json.dumps(out)
+
         yield 1, jOut
 
 
@@ -64,6 +63,9 @@ class mrSample(MRJob):
         # each of the sets coming from different mappers their appropriate weight
         total_counts_from_mappers = 0
         final_samples = []
+
+#        print "xxxx" + str(n)
+
         for x in vars:
             input = json.loads(x)
             total_counts_from_mappers += input[0]
@@ -77,11 +79,10 @@ class mrSample(MRJob):
         for sample_set in samples_from_mappers:
             weight = counts_from_mappers[i] * 1.0 / total_counts_from_mappers
             number_of_needed_samples = int(weight * self.options.sample_size)
+
             for j in range(number_of_needed_samples):
-
-
-
                 final_samples.append(sample_set.pop())
+
             i += 1
 
         yield 1, final_samples
