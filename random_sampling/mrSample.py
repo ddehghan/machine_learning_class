@@ -21,11 +21,13 @@ class mrSample(MRJob):
 
 
     def __init__(self, *args, **kwargs):
+
         super(mrSample, self).__init__(*args, **kwargs)
         self.samples = []
         self.count = 0
 
     def configure_options(self):
+
         super(mrSample, self).configure_options()
 
         # define the sample size parameter
@@ -36,6 +38,8 @@ class mrSample(MRJob):
             help='number of samples in the output file')
 
     def mapper(self, key, line):
+        MRJob.set_status(self, "=============>  mapper called")
+
         sample_line = line
 
         self.count += 1
@@ -49,6 +53,8 @@ class mrSample(MRJob):
                 self.samples[index] = sample_line
 
     def mapper_final(self):
+        MRJob.set_status(self, "=============>  mapper final called")
+
         out = [self.count, self.samples]
         jOut = json.dumps(out)
 
@@ -56,6 +62,8 @@ class mrSample(MRJob):
 
 
     def reducer(self, n, vars):
+        MRJob.set_status(self, "=============>  reducer called")
+
         samples_from_mappers = []
         counts_from_mappers = []
 
