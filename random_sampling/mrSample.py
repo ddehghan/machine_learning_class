@@ -8,14 +8,18 @@ import random
 from mrjob.job import MRJob
 from math import sqrt
 import json
+from mrjob.protocol import JSONValueProtocol, PickleProtocol, RawValueProtocol
+
 
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 
 class mrSample(MRJob):
-    #DEFAULT_PROTOCOL = 'raw_value'
-    #DEFAULT_PROTOCOL = 'json_value'
-    DEFAULT_PROTOCOL = 'json'
+
+    INPUT_PROTOCOL = RawValueProtocol
+    INTERNAL_PROTOCOL = RawValueProtocol
+    OUTPUT_PROTOCOL = RawValueProtocol
+
 
     def __init__(self, *args, **kwargs):
         super(mrSample, self).__init__(*args, **kwargs)
@@ -33,7 +37,8 @@ class mrSample(MRJob):
             help='number of samples in the output file')
 
     def mapper(self, key, line):
-        num = json.loads(line)
+#        num = json.loads(line)
+        num = line
 
         self.count += 1
         if len(self.samples) <= self.options.sample_size:
