@@ -70,9 +70,6 @@ class mrSample(MRJob):
         # First read all the counts from different mappers fo we know the total number of items and we can give
         # each of the sets coming from different mappers their appropriate weight
         total_counts_from_mappers = 0
-        final_samples = []
-
-#        print "xxxx" + str(n)
 
         for x in vars:
             input = json.loads(x)
@@ -89,11 +86,10 @@ class mrSample(MRJob):
             number_of_needed_samples = int(round(weight * self.options.sample_size))
 
             for j in range(number_of_needed_samples):
-                final_samples.append(sample_set.pop())
+                yield 1, sample_set.pop()
 
             i += 1
 
-        yield 1, final_samples
 
 if __name__ == '__main__':
     mrSample.run()
