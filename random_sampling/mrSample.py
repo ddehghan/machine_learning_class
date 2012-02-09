@@ -31,7 +31,7 @@ class mrSample(MRJob):
         super(mrSample, self).configure_options()
 
         # define the sample size parameter
-        self.add_passthrough_option('--k',
+        self.add_passthrough_option('--sample_size',
             dest='sample_size',
             default=10,
             type='int',
