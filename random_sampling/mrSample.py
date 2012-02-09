@@ -24,9 +24,13 @@ class mrSample(MRJob):
 
     def configure_options(self):
         super(mrSample, self).configure_options()
-        self.add_passthrough_option(
-            '--k', dest='sample_size', default=10, type='int',
-            help='k: number of samples')
+
+        # define the sample size parameter
+        self.add_passthrough_option('--k',
+            dest='sample_size',
+            default=10,
+            type='int',
+            help='number of samples in the output file')
 
     def mapper(self, key, line):
         num = json.loads(line)
@@ -51,6 +55,8 @@ class mrSample(MRJob):
         samples_from_mappers = []
         counts_from_mappers = []
 
+        # First read all the counts from different mappers fo we know the total number of items and we can give
+        # each of the sets coming from different mappers their appropriate weight
         total_counts_from_mappers = 0
         final_samples = []
         for x in vars:
@@ -60,14 +66,18 @@ class mrSample(MRJob):
             counts_from_mappers.append(input[0])
             samples_from_mappers.append(input[1])
 
+        # Now based on the number of samples in each mapper we need to select appropriate number of samples form
+        # samples_from_mappers
         i = 0
-        for mapper in samples_from_mappers:
+        for sample_set in samples_from_mappers:
             weight = counts_from_mappers[i] * 1.0 / total_counts_from_mappers
             number_of_needed_samples = int(weight * self.options.sample_size)
             for j in range(number_of_needed_samples):
-                final_samples.append(mapper.pop())
-            i += 1
 
+
+
+                final_samples.append(sample_set.pop())
+            i += 1
 
         yield 1, final_samples
 
