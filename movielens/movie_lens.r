@@ -77,116 +77,40 @@ plot(iterations2, iterations2.error)
 
 
 
+==============  PREDICTIONS ==================
 
 
 
 
-# Test Data:
+-------------- 100k data 
 
-t.raw = scan(file="u1.test", what=list(user=0, movie=0, rating=0), flush=TRUE)
-t.matrix = sparseMatrix(t.raw$user,t.raw$movie,x=t.raw$rating, dims=c(943,1682))
+t.raw = scan(file="ml-100k/u1.test", what=list(user=0, movie=0, rating=0), flush=TRUE)
 
-t.predict <- u2[,1:i] %*% diag(d2[1:i]) %*% t(v2[,1:i])
-
-
-
-# leo
-
-l.raw = scan(file="u1.base", what=list(user=0, movie=0, rating=0), flush=TRUE)l.matrix = sparseMatrix(l.raw$movie, l.raw$user,x=l.raw$rating)
-
-l.svd = svd(l.matrix)
-
-s1 <- l.svd$d
-t1 <- l.svd$u
-d1 <- l.svd$v
-
-
-david = l.matrix[405,]
-predict = david %*% d1 %*% ginv(diag(s1))
-test_predict =  predict %*% diag(s1) %*% t(d1)
-
-par(mfrow=c(1,2))
-plot ((1:1682), test_predict, col="red" )
-plot ((1:1682), david, col="blue")
-
-
-
-# fixed dimentions 
-
-l.raw = scan(file="u1.base", what=list(user=0, movie=0, rating=0), flush=TRUE)
-l.matrix = sparseMatrix(l.raw$movie, l.raw$user,x=l.raw$rating)
-
-l.svd = irlba(l.matrix, nu = 200, nv = 200) 
-
-s1 <- l.svd$d
-t1 <- l.svd$u
-d1 <- l.svd$v
-
-dim(d1)
-length(s1)
-dim(t1)
-
-david = l.matrix_10[,405]
-length(david)
-
-predict = david %*% t1 %*% ginv(diag(s1))
-dim(predict)
-test_predict =  predict %*% diag(s1) %*% t(t1)
-dim(test_predict)
-
-par(mfrow=c(1,2))
-plot ((1:1682), test_predict, col="red" )
-plot ((1:1682), david, col="blue")
-
-
-# scale up
-t.raw = scan(file="u1.test", what=list(user=0, movie=0, rating=0), flush=TRUE)
 t.raw$rating = (t.raw$rating * 100) + 1000
+
 t.matrix = sparseMatrix(t.raw$movie, t.raw$user,x=t.raw$rating, dims=c(1682,943))
 
-l.raw = scan(file="u1.base", what=list(user=0, movie=0, rating=0), flush=TRUE)
+l.raw = scan(file="ml-100k/u1.base", what=list(user=0, movie=0, rating=0), flush=TRUE)
+
 l.raw$rating = (l.raw$rating * 100) + 1000
 
 l.matrix = sparseMatrix(l.raw$movie, l.raw$user,x=l.raw$rating, dims=c(1682,943))
 
-l.svd = irlba(l.matrix, nu = 200, nv = 200) 
-#l.svd = svd(l.matrix) 
-
-s1 <- l.svd$d
-t1 <- l.svd$u
-d1 <- l.svd$v
-
-dim(d1)
-length(s1)
-dim(t1)
+#l.svd = irlba(l.matrix, nu = 200, nv = 200) 
+l.svd = svd(l.matrix) 
 
 
-plot_numbers = 1
-
-par(mfrow=c(plot_numbers,2))
-for (i in c(sample(1:400, plot_numbers)))
-{
-	david = t.matrix[,i]
-	length(david)
-	
-	david_projection_on_psudo_users = david %*% t1 
-	dim(david_projection_on_psudo_users)
-	david_rating_predicted =  david_projection_on_psudo_users %*% t(t1)
-	dim(david_projection_on_psudo_users)
-	
-	ylable = paste("rating ", i)
-	
-	plot ((1:1682), david_rating_predicted, col="red", ylab=ylable, xlab="movies")
-	plot ((1:1682), david, col="blue", ylab= ylable, xlab="movies")
-}
+l.svd2 = irlba(l.matrix, nu = 200, nv = 200) 
+plot_user(2, t.matrix, l.svd2, 1:400)
+plot_movie(2, t.matrix, l.svd2, 1:1682)
 
 --------------- 1 M data
 
-t.raw = scan(file="u1.test", what=list(user=0,"", movie=0,"", rating=0), sep=':', flush=TRUE)
+t.raw = scan(file="ml-1m/u1.test", what=list(user=0,"", movie=0,"", rating=0), sep=':', flush=TRUE)
 t.raw$rating = (t.raw$rating * 100) + 1000
 t.matrix = sparseMatrix(t.raw$movie, t.raw$user,x=t.raw$rating, dims=c(3952,6040))
 
-l.raw = scan(file="u1.base", what=list(user=0,"", movie=0,"", rating=0), sep=":", flush=TRUE)
+l.raw = scan(file="ml-1m/u1.base", what=list(user=0,"", movie=0,"", rating=0), sep=":", flush=TRUE)
 l.raw$rating = (l.raw$rating * 100) + 1000
 
 l.matrix = sparseMatrix(l.raw$movie, l.raw$user,x=l.raw$rating, dims=c(3952,6040))
@@ -198,19 +122,18 @@ l.svd = irlba(l.matrix, nu = 200, nv = 200)
 
 
 
-
-plot_me(2, l.matrix, l.svd, 1500:6040)
+plot_user (2, l.matrix, l.svd, 1500:6040)
 
 -------------------------------------------------------------
 
-plot_me <- function (plot_numbers, data, svd, range ){
+plot_user <- function (plot_numbers, data, svd, range ){
 	s1 <- svd$d
 	t1 <- svd$u
 	d1 <- svd$v
 
-#	dim(d1)
-#	length(s1)
-#	dim(t1)
+	dim(d1)
+	length(s1)
+	dim(t1)
 
 	par(mfrow=c(plot_numbers,2))
 	for (i in c(sample(range, plot_numbers)))
@@ -229,5 +152,80 @@ plot_me <- function (plot_numbers, data, svd, range ){
 		plot ((1:dim (data)[1]), user, col="blue", ylab= ylable, xlab="movies")
 	}
 }	
+-------------------------------------------------------------
+
+plot_movie <- function (plot_numbers, data, svd, range ){
+
+	s1 <- svd$d
+	t1 <- svd$u
+	d1 <- svd$v
+
+	dim(d1)
+	length(s1)
+	dim(t1)
+
+
+	par(mfrow=c(plot_numbers,2))
+	for (i in c(sample(range, plot_numbers)))
+	{
+		movie = data[i,]
+		length(movie)
+		
+		movie_projection_on_psudo_movies = movie %*% d1 
+		dim(movie_projection_on_psudo_movies)
+		movie_rating_predicted =  movie_projection_on_psudo_movies %*% t(d1)
+		dim(movie_rating_predicted)
+		
+		ylable = paste("rating ", i)
+		
+		plot ((1:dim (data)[2]), movie_rating_predicted, col="red", ylab=ylable, xlab="users")
+		plot ((1:dim (data)[2]), movie, col="blue", ylab= ylable, xlab="users")
+	}
+}	
+
+
+
+
+----------------------- TEST --------------
+
+l.svd = irlba(l.matrix, nu = 200, nv = 200) 
+
+
+dim(l.matrix) 
+
+dim(l.svd$v)  #t1
+length(l.svd$d) #s1
+dim(l.svd$u) #d1
+
+length(l.matrix[,4])
+dim(l.matrix[,4] %*% l.svd$u)
+dim(l.matrix[,4] %*% l.svd$u %*% l.svd$v )
+
+vv = l.svd$v %*% (diag(l.svd$d))^2 %*% t(l.svd$v)
+uu = l.svd$u %*% (diag(l.svd$d))^2 %*% t(l.svd$u)
+
+dim(vv)
+dim(uu)
+
+t(l.matrix[,942] %*% l.svd$u)
+
+i = 942
+l.error = c()
+
+l.predict <- l.svd$u[,1:i] %*% diag(l.svd$d[1:i]) %*% t(l.svd$v[,1:i])
+
+l.error  = c( l.error, sum( (l.matrix - l.predict)^2 ) )
+l.error
+
+
+i = 942
+l.error = c()
+
+l.svd$u[1,1:i]
+
+l.predict <- l.svd$u[1,1:i] %*% diag(l.svd$d[1:i]) %*% t(l.svd$v[,1:i])
+
+l.error  = c( l.error, sum( (l.matrix - l.predict)^2 ) )
+l.error
 
 
